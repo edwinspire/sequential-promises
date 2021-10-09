@@ -1,0 +1,23 @@
+{
+  "name": "sequential-promises",
+  "version": "1.0.0",
+  "description": "Ejecuta promesas secuancialmente y/o en grupos ",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edwinspire/sequential-promises.git"
+  },
+  "keywords": [
+    "promises",
+    "javascript"
+  ],
+  "author": "edwinspire",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/edwinspire/sequential-promises/issues"
+  },
+  "homepage": "https://github.com/edwinspire/sequential-promises#readme"
+}
