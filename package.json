@@ -1,5 +1,5 @@
 {
-  "name": "sequential-promises",
+  "name": "@edwinspire/sequential-promises",
   "version": "1.0.0",
   "description": "Ejecuta promesas secuancialmente y/o en grupos ",
   "main": "src/index.js",
