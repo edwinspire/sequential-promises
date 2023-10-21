@@ -20,7 +20,17 @@ console.log(data);
 // Número de bloques en los que deseamos dividir los datos
 const numberOfBlocks = 2;
 
+/*
 PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
+  .then(results => {
+    console.log('Resultados finales:', results.flat());
+  })
+  .catch(error => {
+    console.error('Ocurrió un error:', error);
+  });
+*/
+
+  PromiseSequence.ByItems(processBlock, data, numberOfBlocks)
   .then(results => {
     console.log('Resultados finales:', results.flat());
   })
