@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = class PromiseSequence {
+export default class PromiseSequence {
   constructor() {
     _allSettledPolyfill();
   }
