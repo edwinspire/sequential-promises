@@ -18,7 +18,7 @@ const data = Array.from({ length: 20 }, (_, i) => i + 1); // Genera una matriz d
 console.log(data);
 
 // Número de bloques en los que deseamos dividir los datos
-const numberOfBlocks = 2;
+const numberOfBlocks = 5;
 
 /*
 PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
