@@ -3,24 +3,30 @@ import PromiseSequence from "../src/index.js";
 // Función de ejemplo que simula una tarea costosa
 function processBlock(block) {
 
-    console.log('Block: ', block);
 
   return new Promise((resolve) => {
+
     setTimeout(() => {
-      resolve(block * 2);
-    }, 1000);
+
+      console.log('Block: ', block);
+      resolve({ data: block * 2 });
+    }, 2500
+     + (Math.floor(Math.random() * 1000) + 1)
+    );
   });
 }
+
 
 // Lista de datos que queremos procesar
 const data = Array.from({ length: 20 }, (_, i) => i + 1); // Genera una matriz de números del 1 al 20
 
 console.log(data);
+/*
 
 // Número de bloques en los que deseamos dividir los datos
-const numberOfBlocks = 5;
+const numberOfBlocks = 10;
 
-/*
+
 PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
   .then(results => {
     console.log('Resultados finales:', results.flat());
@@ -30,6 +36,7 @@ PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
   });
 */
 
+/*
   PromiseSequence.ByItems(processBlock, data, numberOfBlocks)
   .then(results => {
     console.log('Resultados finales:', results.flat());
@@ -37,3 +44,17 @@ PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
   .catch(error => {
     console.error('Ocurrió un error:', error);
   });
+*/
+
+const queue = new PromiseSequence(processBlock, 10, data);
+
+queue.onFinish = (results) => {
+  console.log(results);
+};
+
+/*
+data.forEach((param) => {
+  queue.push(param);
+});
+*/
+console.log('Esta corriendo...');

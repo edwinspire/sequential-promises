@@ -1,8 +1,53 @@
 "use strict";
 
 export default class PromiseSequence {
-  constructor() {
-    _allSettledPolyfill();
+  constructor(promiseCallback, numThreads, dataList) {
+    
+
+    this.promiseCallback = promiseCallback;
+    this.numThreads = numThreads;
+    this.queue = dataList || [];
+    this.results = [];
+    this.activePromises = 0;
+
+//    PromiseSequence._allSettledPolyfill();
+this._startPromises();
+
+  }
+
+  async push(param) {
+    this.queue.push(param);
+    this._startPromises();
+  }
+
+  _startPromises() {
+    while (this.activePromises < this.numThreads && this.queue.length > 0) {
+      const param = this.queue.shift();
+      this.activePromises++;
+      this._executePromise(param);
+      console.log('---');
+    }
+  }
+
+  async _executePromise(param) {
+    try {
+      const result = await this.promiseCallback(param);
+      this.results.push({result, param});
+    } catch (error) {
+      this.results.push({error, param});
+    } finally {
+      this.activePromises--;
+      this._startPromises();
+      if (this.queue.length === 0 && this.activePromises === 0) {
+        this._emitFinish();
+      }
+    }
+  }
+
+  _emitFinish() {
+    if (this.onFinish) {
+      this.onFinish(this.results);
+    }
   }
 
   static ArrayChunk(myArray, chunk_size) {
@@ -45,6 +90,7 @@ export default class PromiseSequence {
     const result = endResult.flatMap((r) => r.value);
     return result;
   }
+
 
   static async Secuential(fn_action, iterable) {
     const Response = [];
