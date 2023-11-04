@@ -1,17 +1,37 @@
 "use strict";
 
 export default class PromiseSequence {
-  constructor(promiseCallback, numThreads, dataList) {
-    
+  constructor() {
+
+
+    this.promiseCallback = undefined;
+    this.numThreads = 5;
+    this.queue = [];
+    this.results = [];
+    this.activePromises = 0;
+
+  }
+
+  thread(promiseCallback, numThreads, dataList) {
 
     this.promiseCallback = promiseCallback;
     this.numThreads = numThreads;
     this.queue = dataList || [];
-    this.results = [];
-    this.activePromises = 0;
 
-//    PromiseSequence._allSettledPolyfill();
-this._startPromises();
+    return new Promise((resolve, reject) => {
+
+      try {
+        this._startPromises();
+
+        this._onFinish = () => {
+          resolve(this.results);
+        }
+
+      } catch (error) {
+        reject(error);
+      }
+
+    });
 
   }
 
@@ -25,28 +45,33 @@ this._startPromises();
       const param = this.queue.shift();
       this.activePromises++;
       this._executePromise(param);
-      console.log('---');
+      //console.log('---');
     }
+    console.log('-----------------')
   }
 
   async _executePromise(param) {
-    try {
-      const result = await this.promiseCallback(param);
-      this.results.push({result, param});
-    } catch (error) {
-      this.results.push({error, param});
-    } finally {
-      this.activePromises--;
-      this._startPromises();
-      if (this.queue.length === 0 && this.activePromises === 0) {
-        this._emitFinish();
+    if (this.promiseCallback) {
+      try {
+        const result = await this.promiseCallback(param);
+        this.results.push({ result, param });
+      } catch (error) {
+        this.results.push({ error, param });
+      } finally {
+        this.activePromises--;
+        this._startPromises();
+        if (this.queue.length === 0 && this.activePromises === 0) {
+          this._emitFinish();
+        }
       }
+    } else {
+      console.error('promiseCallback is undefined.');
     }
   }
 
   _emitFinish() {
-    if (this.onFinish) {
-      this.onFinish(this.results);
+    if (this._onFinish) {
+      this._onFinish(this.results);
     }
   }
 
@@ -97,9 +122,11 @@ this._startPromises();
     for (const data of iterable) {
       try {
         const r = await fn_action(data);
-        Response.push({ status: "fulfilled", value: r });
+        // Response.push({ status: "fulfilled", value: r });
+        Response.push({ param: data, result: r });
       } catch (error) {
-        Response.push({ status: "rejected", reason: error });
+        // Response.push({ status: "rejected", reason: error });
+        Response.push({ param: data, error });
       }
     }
     return Response;

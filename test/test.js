@@ -11,7 +11,7 @@ function processBlock(block) {
       console.log('Block: ', block);
       resolve({ data: block * 2 });
     }, 2500
-     + (Math.floor(Math.random() * 1000) + 1)
+    + (Math.floor(Math.random() * 1000) + 1)
     );
   });
 }
@@ -21,7 +21,7 @@ function processBlock(block) {
 const data = Array.from({ length: 20 }, (_, i) => i + 1); // Genera una matriz de números del 1 al 20
 
 console.log(data);
-/*
+
 
 // Número de bloques en los que deseamos dividir los datos
 const numberOfBlocks = 10;
@@ -29,32 +29,47 @@ const numberOfBlocks = 10;
 
 PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
   .then(results => {
-    console.log('Resultados finales:', results.flat());
+    console.log('Resultados finales:', results);
   })
   .catch(error => {
     console.error('Ocurrió un error:', error);
   });
-*/
+
 
 /*
   PromiseSequence.ByItems(processBlock, data, numberOfBlocks)
   .then(results => {
-    console.log('Resultados finales:', results.flat());
+    console.log('Resultados finales:', results);
   })
   .catch(error => {
     console.error('Ocurrió un error:', error);
   });
 */
 
-const queue = new PromiseSequence(processBlock, 10, data);
 
+/*
+const queue = new PromiseSequence();
+
+queue.thread(processBlock, 5, data).then((r) => {
+  console.log(r);
+});
+*/
+
+/*
 queue.onFinish = (results) => {
   console.log(results);
 };
+*/
 
 /*
 data.forEach((param) => {
   queue.push(param);
 });
 */
-console.log('Esta corriendo...');
+
+/*
+setInterval(() => {
+
+  console.log('Esta corriendo...');  
+}, 1000);
+*/
