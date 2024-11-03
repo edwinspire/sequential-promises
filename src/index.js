@@ -35,12 +35,6 @@ export default class PromiseSequence {
 
   }
 
-  /*
-  async push(param) {
-    this.queue.push(param);
-    this._startPromises();
-  }
-  */
 
   _startPromises() {
     while (this.activePromises < this.numThreads && this.queue.length > 0) {

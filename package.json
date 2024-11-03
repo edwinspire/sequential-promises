@@ -1,7 +1,7 @@
 {
   "name": "@edwinspire/sequential-promises",
-  "version": "1.0.0",
-  "description": "Ejecuta promesas secuancialmente y/o en grupos ",
+  "version": "1.0.1",
+  "description": "Execute promises sequentially and/or in batches.",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
