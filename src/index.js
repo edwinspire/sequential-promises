@@ -2,39 +2,36 @@
 
 export default class PromiseSequence {
   constructor() {
-
-
     this.promiseCallback = undefined;
     this.numThreads = 5;
     this.queue = [];
     this.results = [];
     this.activePromises = 0;
-
   }
 
   thread(promiseCallback, numThreads, dataList) {
-
     this.promiseCallback = promiseCallback;
     this.numThreads = numThreads;
     this.queue = dataList || [];
 
-    return new Promise((resolve, reject) => {
+    this._startPromises();
 
+    /*
+    return new Promise((resolve, reject) => {
       try {
         this._startPromises();
-
-        this._onFinish = () => {
-          resolve(this.results);
-        }
-
+       // this._emitFinish();
+        resolve(this.queue.length);
       } catch (error) {
         reject(error);
       }
-
     });
-
+    */
   }
 
+  push(item) {
+    this.queue.push(item);
+  }
 
   _startPromises() {
     while (this.activePromises < this.numThreads && this.queue.length > 0) {
@@ -43,7 +40,7 @@ export default class PromiseSequence {
       this._executePromise(param);
       //console.log('---');
     }
-    console.log('-----------------')
+    console.log("-----------------");
   }
 
   async _executePromise(param) {
@@ -61,13 +58,13 @@ export default class PromiseSequence {
         }
       }
     } else {
-      console.error('promiseCallback is undefined.');
+      console.error("promiseCallback is undefined.");
     }
   }
 
   _emitFinish() {
-    if (this._onFinish) {
-      this._onFinish(this.results);
+    if (this.onFinish) {
+      this.onFinish(this.results);
     }
   }
 
@@ -112,7 +109,6 @@ export default class PromiseSequence {
     return result;
   }
 
-
   static async Secuential(fn_action, iterable) {
     const Response = [];
     for (const data of iterable) {
@@ -127,5 +123,4 @@ export default class PromiseSequence {
     }
     return Response;
   }
-
-};
+}

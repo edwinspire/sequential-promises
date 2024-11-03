@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "test": "node test/test.js"
+    "thread": "node ./test/thread.js",
+    "ByItems": "node ./test/ByItems.js",
+    "ByBlocks": "node ./test/ByBlocks.js"
   },
   "repository": {
     "type": "git",

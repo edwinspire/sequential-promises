@@ -25,16 +25,14 @@ Runs the promiseCallback function in parallel for dataList elements, with a maxi
 	- promiseCallback: function that returns a promise to be executed for each element.
 	- numThreads: number of promises in parallel.
 	- dataList: list of data on which promiseCallback will be applied.
-- Return: A Promise that resolves when all promises have finished.
+- Return: void.
 
 Example:
 
     const sequence = new PromiseSequence();
     const processData = (item) => new Promise((resolve) => setTimeout(() => resolve(item * 2), 100));
     
-    sequence.thread(processData, 3, [1, 2, 3, 4, 5])
-      .then((results) => console.log(results)) // [{ result: 2, param: 1 }, { result: 4, param: 2 }, ...]
-      .catch((error) => console.error(error));
+    sequence.thread(processData, 3, [1, 2, 3, 4, 5]);
 
 ### ArrayChunk static method
 

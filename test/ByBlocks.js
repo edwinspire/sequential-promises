@@ -3,7 +3,6 @@ import PromiseSequence from "../src/index.js";
 // Función de ejemplo que simula una tarea costosa
 function processBlock(block) {
 
-
   return new Promise((resolve) => {
 
     setTimeout(() => {
@@ -26,7 +25,6 @@ console.log(data);
 // Número de bloques en los que deseamos dividir los datos
 const numberOfBlocks = 10;
 
-
 PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
   .then(results => {
     console.log('Resultados finales:', results);
@@ -34,42 +32,3 @@ PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
   .catch(error => {
     console.error('Ocurrió un error:', error);
   });
-
-
-/*
-  PromiseSequence.ByItems(processBlock, data, numberOfBlocks)
-  .then(results => {
-    console.log('Resultados finales:', results);
-  })
-  .catch(error => {
-    console.error('Ocurrió un error:', error);
-  });
-*/
-
-
-/*
-const queue = new PromiseSequence();
-
-queue.thread(processBlock, 5, data).then((r) => {
-  console.log(r);
-});
-*/
-
-/*
-queue.onFinish = (results) => {
-  console.log(results);
-};
-*/
-
-/*
-data.forEach((param) => {
-  queue.push(param);
-});
-*/
-
-/*
-setInterval(() => {
-
-  console.log('Esta corriendo...');  
-}, 1000);
-*/
