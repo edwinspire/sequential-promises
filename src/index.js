@@ -5,67 +5,52 @@ export default class PromiseSequence {
     this.promiseCallback = undefined;
     this.numThreads = 5;
     this.queue = [];
-    this.results = [];
     this.activePromises = 0;
   }
 
-  thread(promiseCallback, numThreads, dataList) {
+  async thread(promiseCallback, numThreads, dataList) {
     this.promiseCallback = promiseCallback;
     this.numThreads = numThreads;
     this.queue = dataList || [];
 
-    this._startPromises();
+    while (true) {
+      if (
+        this.promiseCallback &&
+        this.activePromises < this.numThreads &&
+        this.queue.length > 0
+      ) {
+        const param = this.queue.shift();
+        this.activePromises++;
+        try {
+          console.log(">>>>", this.activePromises, this.queue.length);
 
-    /*
-    return new Promise((resolve, reject) => {
-      try {
-        this._startPromises();
-       // this._emitFinish();
-        resolve(this.queue.length);
-      } catch (error) {
-        reject(error);
+          this.promiseCallback(param)
+            .then((result) => {
+              console.log(result);
+              if (this.onFinish) {
+                this.onFinish({ resolve: result });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              this.onFinish({ error: err });
+            })
+            .finally(() => {
+              console.log("Ha finalizado.");
+              this.activePromises--;
+            });
+        } catch (error) {
+          console.error("Error al guardar log:", error);
+        }
+      } else {
+        // Pausa para evitar consumo innecesario de CPU
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
-    });
-    */
+    }
   }
 
   push(item) {
     this.queue.push(item);
-  }
-
-  _startPromises() {
-    while (this.activePromises < this.numThreads && this.queue.length > 0) {
-      const param = this.queue.shift();
-      this.activePromises++;
-      this._executePromise(param);
-      //console.log('---');
-    }
-    console.log("-----------------");
-  }
-
-  async _executePromise(param) {
-    if (this.promiseCallback) {
-      try {
-        const result = await this.promiseCallback(param);
-        this.results.push({ result, param });
-      } catch (error) {
-        this.results.push({ error, param });
-      } finally {
-        this.activePromises--;
-        this._startPromises();
-        if (this.queue.length === 0 && this.activePromises === 0) {
-          this._emitFinish();
-        }
-      }
-    } else {
-      console.error("promiseCallback is undefined.");
-    }
-  }
-
-  _emitFinish() {
-    if (this.onFinish) {
-      this.onFinish(this.results);
-    }
   }
 
   static ArrayChunk(myArray, chunk_size) {

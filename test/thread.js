@@ -4,9 +4,9 @@ import PromiseSequence from "../src/index.js";
 function processBlock(block) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log("Block: ", block);
+      console.log("Block: ", block, new Date());
       resolve({ data: block * 2 });
-    }, 2500 + (Math.floor(Math.random() * 1000) + 1));
+    }, 1500 + (Math.floor(Math.random() * 1000) + 1));
   });
 }
 
@@ -16,28 +16,23 @@ const data = Array.from({ length: 20 }, (_, i) => i + 1); // Genera una matriz d
 console.log(data);
 
 // Número de bloques en los que deseamos dividir los datos
-const numberOfBlocks = 10;
-
-let interval = setInterval(() => {
-  console.log("Esta corriendo...");
-}, 1000);
+const numberOfBlocks = 1;
 
 const queue = new PromiseSequence();
 
-/*
 setInterval(() => {
-  queue.push(99);
+  queue.numThreads = queue.numThreads + 1;
 }, 1000);
-*/
 
-queue.thread(processBlock, 5, data);
+setInterval(() => {
+  console.log("------ Agrega data ------");
+  Array.from({ length: 20 }, (_, i) => i + 1).forEach((item) => {
+    queue.push(item);
+  });
+}, 5000);
 
-queue.onFinish = (results) => {
-  console.log("on Finish", results);
-  clearInterval(interval);
+queue.thread(processBlock, numberOfBlocks, data);
+
+queue.onFinish = (data) => {
+  console.log(">>>>>>> ", data);
 };
-
-data.forEach((param) => {
-  queue.push(param);
-  console.log("Push item", queue.queue.length);
-});

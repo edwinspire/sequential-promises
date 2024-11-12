@@ -33,6 +33,10 @@ Example:
     const processData = (item) => new Promise((resolve) => setTimeout(() => resolve(item * 2), 100));
     
     sequence.thread(processData, 3, [1, 2, 3, 4, 5]);
+    sequence.onFinish = (data) => {
+    console.log(">>>>>>> ", data);
+    };
+
 
 ### ArrayChunk static method
 
@@ -99,9 +103,11 @@ Executes a function sequentially over an iterable list, so that only one element
     const callback = async (item) => item * 2;
     
     const sequence = new PromiseSequence();
-    sequence.thread(callback, 2, dataList)
-      .then(results => console.log("Results:", results))
-      .catch(error => console.error("Error:", error));
+    sequence.thread(callback, 2, dataList);
+    sequence.onFinish = (data) => {
+    console.log(">>>>>>> ", data);
+    };
+
 
 This example creates an instance of PromiseSequence and uses the thread method to process each dataList element with the callback, limited to 2 simultaneous threads.
 
