@@ -22,21 +22,21 @@ export default class PromiseSequence {
         const param = this.queue.shift();
         this.activePromises++;
         try {
-          console.log(">>>>", this.activePromises, this.queue.length);
+       //   console.log(">>>>", this.activePromises, this.queue.length);
 
           this.promiseCallback(param)
             .then((result) => {
-              console.log(result);
+           //   console.log(result);
               if (this.onFinish) {
                 this.onFinish({ resolve: result });
               }
             })
             .catch((err) => {
-              console.log(err);
+          //    console.log(err);
               this.onFinish({ error: err });
             })
             .finally(() => {
-              console.log("Ha finalizado.");
+            //  console.log("Ha finalizado.");
               this.activePromises--;
             });
         } catch (error) {
