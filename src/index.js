@@ -103,7 +103,7 @@ export default class PromiseSequence {
 
     const elements_per_block = Math.ceil(list_items.length / number_blocks);
 
-    return PromiseSequence.ByItems(fn_action, list_items, elements_per_block);
+    return PromiseSequence.ByItems(fn_action, elements_per_block, list_items);
   }
 
   static async ByItems(fn_action, items_per_block, list_items) {
@@ -116,7 +116,7 @@ export default class PromiseSequence {
 
     if (!PromiseSequence._isArray(list_items)) {
       throw { message: "list_items is not Array", value: list_items };
-    }
+    } 
 
     const blocks = PromiseSequence.ArrayChunk(list_items, items_per_block);
     const arrayPromises = blocks.map((block) =>
