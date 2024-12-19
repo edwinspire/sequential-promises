@@ -8,10 +8,22 @@ export default class PromiseSequence {
     this.activePromises = 0;
   }
 
-  async thread(promiseCallback, dataList, numThreads) {
+  static _isNumber(value) {
+    return typeof value === "number" && !isNaN(value);
+  }
+
+  static _isArray(value) {
+    return value && Array.isArray(value);
+  }
+
+  async thread(promiseCallback, numThreads, dataList) {
     this.promiseCallback = promiseCallback;
     this.numThreads = numThreads;
     this.queue = dataList || [];
+
+    if (!PromiseSequence._isNumber(numThreads)) {
+      throw { message: "numThreads is not number", value: numThreads };
+    }
 
     while (true) {
       if (
@@ -22,12 +34,12 @@ export default class PromiseSequence {
         const param = this.queue.shift();
         this.activePromises++;
         try {
-       //   console.log(">>>>", this.activePromises, this.queue.length);
+          //   console.log(">>>>", this.activePromises, this.queue.length);
 
           this.promiseCallback(param)
             .then((result) => {
-           //   console.log(result);
-           /*   
+              //   console.log(result);
+              /*   
            if (this.onFinish) {
                 this.onFinish({ resolve: result });
               }
@@ -35,12 +47,11 @@ export default class PromiseSequence {
             })
             .catch((err) => {
               console.log(err);
-//              this.onFinish({ error: err });
+              //              this.onFinish({ error: err });
             })
             .finally(() => {
-            //  console.log("Ha finalizado.");
+              //  console.log("Ha finalizado.");
               this.activePromises--;
-          
             });
         } catch (error) {
           console.error("Error al guardar log:", error);
@@ -48,7 +59,6 @@ export default class PromiseSequence {
       } else {
         // Pausa para evitar consumo innecesario de CPU
         await new Promise((resolve) => setTimeout(resolve, 100));
-
       }
     }
   }
@@ -82,12 +92,32 @@ export default class PromiseSequence {
     );
   }
 
-  static async ByBlocks(fn_action, list_items, number_blocks) {
+  static async ByBlocks(fn_action, number_blocks, list_items) {
+    if (!PromiseSequence._isNumber(number_blocks)) {
+      throw { message: "number_blocks is not number", value: number_blocks };
+    }
+
+    if (!PromiseSequence._isArray(list_items)) {
+      throw { message: "list_items is not Array", value: list_items };
+    }
+
     const elements_per_block = Math.ceil(list_items.length / number_blocks);
+
     return PromiseSequence.ByItems(fn_action, list_items, elements_per_block);
   }
 
-  static async ByItems(fn_action, list_items, items_per_block) {
+  static async ByItems(fn_action, items_per_block, list_items) {
+    if (!PromiseSequence._isNumber(items_per_block)) {
+      throw {
+        message: "items_per_block is not number",
+        value: items_per_block,
+      };
+    }
+
+    if (!PromiseSequence._isArray(list_items)) {
+      throw { message: "list_items is not Array", value: list_items };
+    }
+
     const blocks = PromiseSequence.ArrayChunk(list_items, items_per_block);
     const arrayPromises = blocks.map((block) =>
       PromiseSequence.Secuential(fn_action, block)
