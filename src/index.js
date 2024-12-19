@@ -8,7 +8,7 @@ export default class PromiseSequence {
     this.activePromises = 0;
   }
 
-  async thread(promiseCallback, numThreads, dataList) {
+  async thread(promiseCallback, dataList, numThreads) {
     this.promiseCallback = promiseCallback;
     this.numThreads = numThreads;
     this.queue = dataList || [];
@@ -40,6 +40,7 @@ export default class PromiseSequence {
             .finally(() => {
             //  console.log("Ha finalizado.");
               this.activePromises--;
+          
             });
         } catch (error) {
           console.error("Error al guardar log:", error);
@@ -47,6 +48,7 @@ export default class PromiseSequence {
       } else {
         // Pausa para evitar consumo innecesario de CPU
         await new Promise((resolve) => setTimeout(resolve, 100));
+
       }
     }
   }
