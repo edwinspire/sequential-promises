@@ -27,13 +27,15 @@ export default class PromiseSequence {
           this.promiseCallback(param)
             .then((result) => {
            //   console.log(result);
-              if (this.onFinish) {
+           /*   
+           if (this.onFinish) {
                 this.onFinish({ resolve: result });
               }
+              */
             })
             .catch((err) => {
-          //    console.log(err);
-              this.onFinish({ error: err });
+              console.log(err);
+//              this.onFinish({ error: err });
             })
             .finally(() => {
             //  console.log("Ha finalizado.");
