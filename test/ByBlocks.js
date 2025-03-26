@@ -25,7 +25,7 @@ console.log(data);
 // Número de bloques en los que deseamos dividir los datos
 const numberOfBlocks = 10;
 
-PromiseSequence.ByBlocks(processBlock, data, numberOfBlocks)
+PromiseSequence.ByBlocks(processBlock, numberOfBlocks, data)
   .then(results => {
     console.log('Resultados finales:', results);
   })
