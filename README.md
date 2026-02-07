@@ -1,114 +1,122 @@
-# PromiseSequence class
+# Sequential Promises
 
-The PromiseSequence class allows you to execute a set of promises sequentially or in parallel, depending on the number of threads specified. This is useful for managing asynchronous processes with concurrency constraints, such as HTTP requests, database queries, or any other asynchronous task that must be executed in batches.
+A lightweight and flexible library to execute promises sequentially or in parallel with concurrency control. Ideal for managing batch processing, API rate limits, or any asynchronous tasks that need thread-like management in a single-threaded Node.js/Browser environment.
 
-### Constructor
+## Installation
 
-`constructor()` 
+```bash
+npm install @edwinspire/sequential-promises
+```
 
-Initializes an instance of `PromiseSequence` with the following attributes:
+## Usage
 
-- `promiseCallback`: function that will be executed as a promise for each element in the queue.
-- `numThreads`: number of promises to be executed in parallel (default is 5).
-- `queue`: array of elements for which promises will be executed.
-- `results`: array where the results or errors of each promise will be stored.
-- `activePromises`: counter of active promises currently running.
+Import the class:
 
+```javascript
+import PromiseSequence from "@edwinspire/sequential-promises";
+```
 
-### Thread method
+## API Documentation
 
-    thread(promiseCallback, numThreads, dataList)
+### `PromiseSequence` Class
 
-Runs the promiseCallback function in parallel for dataList elements, with a maximum of numThreads promises in parallel.
+#### `constructor()`
+Initializes a new `PromiseSequence` instance.
 
- - Parameters:
-	- promiseCallback: function that returns a promise to be executed for each element.
-	- numThreads: number of promises in parallel.
-	- dataList: list of data on which promiseCallback will be applied.
-- Return: void.
+*   **Properties**:
+    *   `numThreads` (number): Default concurrency limit (default: 5).
+    *   `queue` (Array): Internal queue of data items to process.
+    *   `activePromises` (number): Current count of active executions.
+    *   `onFinish` (Function): Optional callback triggered on individual promise resolution or rejection.
 
-Example:
+---
 
-    const sequence = new PromiseSequence();
-    const processData = (item) => new Promise((resolve) => setTimeout(() => resolve(item * 2), 100));
-    
-    sequence.thread(processData, 3, [1, 2, 3, 4, 5]);
-    sequence.onFinish = (data) => {
-    console.log(">>>>>>> ", data);
-    };
+### Instance Methods
 
+#### `thread(promiseCallback, numThreads, dataList)`
+Starts a background worker style process that consumes items from the queue using `numThreads` concurrency. It continues processing as long as items exist in the queue.
 
-### ArrayChunk static method
+*   **Parameters**:
+    *   `promiseCallback` (Function): A function that accepts an item and returns a Promise.
+        *   signature: `(item) => Promise<any>`
+    *   `numThreads` (number): The maximum number of concurrent executions.
+    *   `dataList` (Array): (Optional) Initial list of items to add to the queue.
+*   **Return**: `Promise<void>` (Resolves when the current synchronous setup is done, but processing runs asynchronously).
 
-    static ArrayChunk(myArray, chunk_size)
+**Example**:
+```javascript
+const seq = new PromiseSequence();
 
-Divides an array into blocks of size chunk_size.
+// Define a worker function
+const worker = async (item) => {
+    console.log("Processing:", item);
+    await new Promise(r => setTimeout(r, 1000));
+    return item * 2;
+};
 
-- Parameters:
-	- myArray: array to divide.
-	- chunk_size: size of each block.
-- Return: array of arrays (blocks).
+// Handle per-item completion
+seq.onFinish = ({ resolve, error, param }) => {
+    if (error) console.error("Failed:", param, error);
+    else console.log("Finished:", param, "Result:", resolve);
+};
 
-Example:
+// Start processing 3 items in parallel
+seq.thread(worker, 3, [1, 2, 3, 4, 5, 6]);
+```
 
-    const chunks = PromiseSequence.ArrayChunk([1, 2, 3, 4, 5], 2); console.log(chunks); // [[1, 2], [3, 4], [5]]
+#### `push(item)`
+Adds an item to the queue and triggers processing if the active thread count is below the limit. Useful for dynamic workloads where items are added over time.
 
-### ByBlocks static method
+*   **Parameters**:
+    *   `item` (any): The data item to process.
 
-    static async ByBlocks(fn_action, list_items, number_blocks)
+---
 
-Runs an asynchronous function fn_action for each item in list_items, splitting the work into number_blocks blocks.
+### Static Methods
 
-- Parameters:
-	- fn_action: function that returns a promise.
-	- list_items: list of data to apply the function.
-	- number_blocks: number of blocks to divide the list into.
-- Return: a promise that is resolved by results.
+#### `static Sequential(fn_action, iterable)`
+Executes a function strictly sequentially (one by one) over a list of items.
 
-Example:
+*   **Parameters**:
+    *   `fn_action` (Function): Function that returns a Promise.
+    *   `iterable` (Array): List of items to process.
+*   **Return**: `Promise<Array<{param, result}|{param, error}>>`
+    *   Returns an array of objects containing the original parameter and either the `result` or `error`.
 
-    const results = await PromiseSequence.ByBlocks(async (x) => x * 2, [1, 2, 3, 4, 5], 2);
-    console.log(results); // [{param: 1, result: 2}, ...]
+#### `static ByBlocks(fn_action, number_blocks, list_items)`
+Splits the total list of items into a fixed number of blocks and processes each block sequentially relative to itself, but blocks run concurrently.
 
+*   **Parameters**:
+    *   `fn_action` (Function): Function that returns a Promise.
+    *   `number_blocks` (number): Total number of blocks to divide the data into.
+    *   `list_items` (Array): The data array.
+*   **Return**: `Promise<Array>` (Flattened array of results).
 
-### ByItems static method
+#### `static ByItems(fn_action, items_per_block, list_items)`
+Splits the list into chunks of a specific size (`items_per_block`). Each chunk is processed sequentially within itself, but multiple chunks run concurrently.
 
-    static async ByItems(fn_action, list_items, items_per_block) -> Promise<Array>
+*   **Parameters**:
+    *   `fn_action` (Function): Function that returns a Promise.
+    *   `items_per_block` (number): Size of each chunk.
+    *   `list_items` (Array): The data array.
+*   **Return**: `Promise<Array>` (Flattened array of results).
 
-Splits list_items into blocks of items_per_block elements and runs fn_action on each block.
+#### `static ArrayChunk(myArray, chunk_size)`
+Helper utility to split an array into smaller chunks.
 
-Example:
+*   **Parameters**:
+    *   `myArray` (Array): Input array.
+    *   `chunk_size` (number): Number of elements per chunk.
+*   **Return**: `Array<Array>` (Array of arrays).
 
-    PromiseSequence.ByItems(myAction, [1, 2, 3, 4], 2)
-      .then(result => console.log(result));
+## Legacy Helper
+*   `static Secuential`: Deprecated alias for `Sequential`.
 
+---
 
-### Secuential
-
-    static async Secuential(fn_action, iterable) -> Promise<Array>
-Executes a function sequentially over an iterable list, so that only one element is processed at a time.
-
-- Parameters:
-	- fn_action: Function to execute.
-	- iterable: List of elements.
-- Example:
-
-    const myAction = async (item) => item * 2;
-    PromiseSequence.Secuential(myAction, [1, 2, 3])
-      .then(result => console.log(result));
-
-### Complete Use Example
-
-    const dataList = [1, 2, 3, 4, 5];
-    const callback = async (item) => item * 2;
-    
-    const sequence = new PromiseSequence();
-    sequence.thread(callback, 2, dataList);
-    sequence.onFinish = (data) => {
-    console.log(">>>>>>> ", data);
-    };
-
-
-This example creates an instance of PromiseSequence and uses the thread method to process each dataList element with the callback, limited to 2 simultaneous threads.
-
-
+## Technical Notes
+*   **Concurrency**: The `thread`, `ByBlocks`, and `ByItems` methods allow concurrent execution up to the specified limits.
+*   **Queue Management**: The `thread` method uses an event-driven internal queue. You can push new items at any time.
+*   **Error Handling**:
+    *   `Sequential` captures errors and returns them in the result object `{ param, error }`.
+    *   `thread` passes errors to the `onFinish` callback if defined.
