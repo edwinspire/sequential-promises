@@ -120,3 +120,14 @@ Helper utility to split an array into smaller chunks.
 *   **Error Handling**:
     *   `Sequential` captures errors and returns them in the result object `{ param, error }`.
     *   `thread` passes errors to the `onFinish` callback if defined.
+
+
+---
+
+> 🚨 **IMPORTANT NOTICE / AVISO IMPORTANTE** 🚨
+> 
+> Due to force majeure and loss of access to this GitHub account, **this repository has been migrated and is now active at its new home**:
+> 
+> 👉 **[New Active Repository URL](https://github.com/rdsslab/sequential-promises)** 👈
+> 
+> Please update your bookmarks, clones, and remotes. This version will no longer receive updates. Thank you for your understanding.
